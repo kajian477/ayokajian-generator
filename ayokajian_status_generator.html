@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AyoKajian Status Generator</title>
+  <style>
+    :root {
+      --bg: #08110f;
+      --panel: #0e1b18;
+      --panel-2: #12211d;
+      --text: #eef7f2;
+      --muted: #b8c8c0;
+      --gold: #e7c56a;
+      --green: #2fb37f;
+      --green-2: #1d6b52;
+      --danger: #ff7a7a;
+      --line: rgba(255,255,255,.08);
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: linear-gradient(180deg, #06100d 0%, #0b1714 100%); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { min-height: 100vh; }
+
+    .wrap {
+      width: min(1400px, calc(100% - 32px));
+      margin: 24px auto 48px;
+      display: grid;
+      grid-template-columns: 420px minmax(320px, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .sidebar { position: sticky; top: 16px; }
+
+    .section { padding: 20px; border-bottom: 1px solid var(--line); }
+    .section:last-child { border-bottom: 0; }
+
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 26px; line-height: 1.1; letter-spacing: -.03em; }
+    h2 { font-size: 16px; margin-bottom: 14px; color: var(--gold); letter-spacing: .02em; }
+    .sub { color: var(--muted); margin-top: 8px; font-size: 14px; line-height: 1.5; }
+    .tiny { color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .grid { display: grid; gap: 12px; }
+    .grid.two { grid-template-columns: 1fr 1fr; }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+
+    input, select, textarea, button {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font: inherit;
+      outline: none;
+    }
+
+    textarea { min-height: 100px; resize: vertical; }
+    input[type="color"] { padding: 6px; height: 46px; }
+    input[type="range"] { padding: 0; }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(231,197,106,.6);
+      box-shadow: 0 0 0 4px rgba(231,197,106,.12);
+    }
+
+    .actions { display: grid; gap: 10px; }
+
+    .btn {
+      cursor: pointer;
+      font-weight: 700;
+      transition: .2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), #f6dda0);
+      color: #231a06;
+      border: 0;
+    }
+
+    .btn-primary:hover { transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(47,179,127,.18), rgba(29,107,82,.18));
+      border-color: rgba(47,179,127,.35);
+    }
+
+    .preview-wrap {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      justify-items: center;
+    }
+
+    .toolbar {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+
+    #statusCard {
+      width: 360px;
+      aspect-ratio: 9 / 16;
+      border-radius: 28px;
+      overflow: hidden;
+      position: relative;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(231,197,106,.18), transparent 35%),
+        radial-gradient(circle at 85% 15%, rgba(47,179,127,.18), transparent 28%),
+        radial-gradient(circle at 50% 85%, rgba(255,255,255,.06), transparent 30%),
+        linear-gradient(180deg, #0a1512 0%, #10201c 55%, #08110f 100%);
+      box-shadow: 0 30px 80px rgba(0,0,0,.45);
+      isolation: isolate;
+    }
+
+    #statusCard::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.06), transparent 18%),
+        radial-gradient(circle at 50% 35%, rgba(255,255,255,.10), transparent 42%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .ornament {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .65;
+    }
+
+    .ornament .line-top,
+    .ornament .line-bottom {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(231,197,106,.7), transparent);
+    }
+
+    .ornament .line-top { top: 24px; }
+    .ornament .line-bottom { bottom: 26px; }
+
+    .ornament .glow {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: .16;
+      background: var(--cardGlow, #e7c56a);
+      left: 50%;
+      transform: translateX(-50%);
+      top: 38%;
+    }
+
+    .status-content {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      padding: 52px 30px 38px;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 15px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.78);
+      margin-bottom: 22px;
+    }
+
+    .headline {
+      font-weight: 800;
+      line-height: 1.04;
+      letter-spacing: -.045em;
+      font-size: 52px;
+      text-wrap: balance;
+      text-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+
+    .headline .accent { color: var(--headlineAccent, var(--gold)); }
+
+    .subhead {
+      margin-top: 18px;
+      font-size: 26px;
+      line-height: 1.2;
+      color: rgba(255,255,255,.92);
+      text-wrap: balance;
+      text-shadow: 0 8px 24px rgba(0,0,0,.3);
+    }
+
+    .event-box {
+      margin-top: 26px;
+      padding: 16px 16px 18px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      display: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+
+    .event-title {
+      font-size: 22px;
+      line-height: 1.18;
+      font-weight: 800;
+      text-wrap: balance;
+    }
+
+    .event-meta {
+      margin-top: 12px;
+      display: grid;
+      gap: 8px;
+      color: rgba(255,255,255,.84);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .cta-label {
+      margin-top: auto;
+      font-size: 16px;
+      color: rgba(255,255,255,.8);
+      letter-spacing: .02em;
+      font-weight: 600;
+    }
+
+    .cta-url {
+      margin-top: 12px;
+      display: inline-flex;
+      align-self: center;
+      max-width: 100%;
+      padding: 16px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(24,86,66,.95), rgba(16,50,40,.96));
+      border: 2px solid rgba(231,197,106,.75);
+      color: #fff;
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 900;
+      letter-spacing: -.03em;
+      box-shadow: 0 12px 30px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.1);
+      word-break: break-word;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,.56);
+      line-height: 1.45;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+      max-height: 280px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .event-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,.03);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .event-item:hover { transform: translateY(-1px); border-color: rgba(231,197,106,.35); }
+    .event-item.active { border-color: rgba(231,197,106,.55); background: rgba(231,197,106,.08); }
+    .event-item .t { font-weight: 700; line-height: 1.35; }
+    .event-item .m { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .notice {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .notice.error {
+      color: #ffd7d7;
+      border-color: rgba(255,122,122,.25);
+      background: rgba(255,122,122,.08);
+    }
+
+    .notice.success {
+      color: #d8ffec;
+      border-color: rgba(47,179,127,.25);
+      background: rgba(47,179,127,.08);
+    }
+
+    .muted { color: var(--muted); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 1080px) {
+      .wrap { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+    }
+
+    @media (max-width: 520px) {
+      .wrap { width: min(100% - 20px, 100%); margin-top: 10px; }
+      .toolbar { padding: 16px 14px 0; }
+      .preview-wrap { padding: 14px; }
+      #statusCard { width: min(100%, 360px); }
+      .grid.two, .grid.three { grid-template-columns: 1fr; }
+      .headline { font-size: 46px; }
+      .subhead { font-size: 23px; }
+      .cta-url { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="card sidebar">
+      <div class="section">
+        <h1>AyoKajian Status Generator</h1>
+        <p class="sub">Generator gambar status WhatsApp otomatis dari data kajian CSV. Sudah pakai logika <strong>WIB</strong> untuk filter kajian hari ini.</p>
+      </div>
+
+      <div class="section grid">
+        <div>
+          <label for="csvUrl">CSV URL</label>
+          <input id="csvUrl" type="url" value="https://docs.google.com/spreadsheets/d/e/2PACX-1vSbO_bJnqZ-ZV9w_hOCHwhQB6-KMdMb1mG9l66I7Ht0YcIguKKVuSuxwR3E-0vlIVHh5-amvMvyhkUz/pub?gid=0&single=true&output=csv" />
+        </div>
+        <div class="grid two">
+          <button id="loadBtn" class="btn btn-primary">Muat data kajian</button>
+          <button id="todayBtn" class="btn btn-secondary">Pilih kajian hari ini</button>
+        </div>
+        <div id="statusMsg" class="notice">Masukkan CSV lalu klik <strong>Muat data kajian</strong>.</div>
+      </div>
+
+      <div class="section">
+        <h2>Pilih Kajian</h2>
+        <div id="eventList" class="list"></div>
+      </div>
+
+      <div class="section grid">
+        <h2>Isi Teks</h2>
+        <div>
+          <label for="brandText">Brand kecil atas</label>
+          <input id="brandText" type="text" value="AYOKAJIAN" />
+        </div>
+        <div>
+          <label for="headlineText">Judul besar</label>
+          <textarea id="headlineText">Bingung mau kajian dimana hari ini?</textarea>
+        </div>
+        <div>
+          <label for="subheadText">Subjudul</label>
+          <textarea id="subheadText">Tenang, tinggal klik ayokajian.com</textarea>
+        </div>
+        <div>
+          <label for="ctaLabel">Teks CTA</label>
+          <input id="ctaLabel" type="text" value="Klik sekarang" />
+        </div>
+        <div>
+          <label for="urlText">URL di tombol</label>
+          <input id="urlText" type="text" value="ayokajian.com" />
+        </div>
+        <div>
+          <label><input id="showEventBox" type="checkbox" checked style="width:auto; margin-right:8px;"> Tampilkan box detail kajian terpilih</label>
+        </div>
+      </div>
+
+      <div class="section grid">
+        <h2>Style</h2>
+        <div class="grid two">
+          <div>
+            <label for="bgStart">Warna background atas</label>
+            <input id="bgStart" type="color" value="#0a1512" />
+          </div>
+          <div>
+            <label for="bgEnd">Warna background bawah</label>
+            <input id="bgEnd" type="color" value="#08110f" />
+          </div>
+        </div>
+        <div class="grid two">
+          <div>
+            <label for="accentColor">Warna aksen</label>
+            <input id="accentColor" type="color" value="#e7c56a" />
+          </div>
+          <div>
+            <label for="glowColor">Warna glow</label>
+            <input id="glowColor" type="color" value="#2fb37f" />
+          </div>
+        </div>
+        <div>
+          <label for="headlineSize">Ukuran judul</label>
+          <input id="headlineSize" type="range" min="36" max="68" step="1" value="52" />
+        </div>
+      </div>
+
+      <div class="section actions">
+        <button id="downloadBtn" class="btn btn-primary">Download PNG</button>
+        <button id="copyCaptionBtn" class="btn btn-secondary">Copy caption WhatsApp</button>
+        <div class="notice success">
+          Caption hasil copy akan berisi hook + link aktif untuk status WhatsApp.
+        </div>
+      </div>
+    </aside>
+
+    <main class="card">
+      <div class="toolbar">
+        <div class="pill">Format: <strong>1080 × 1920</strong></div>
+        <div class="pill">Timezone: <strong>Asia/Jakarta (WIB)</strong></div>
+      </div>
+
+      <div class="preview-wrap">
+        <div id="statusCard">
+          <div class="ornament">
+            <div class="line-top"></div>
+            <div class="glow"></div>
+            <div class="line-bottom"></div>
+          </div>
+
+          <div class="status-content">
+            <div id="brandPreview" class="brand">AYOKAJIAN</div>
+            <div id="headlinePreview" class="headline">Bingung mau <span class="accent">kajian</span> dimana hari ini?</div>
+            <div id="subheadPreview" class="subhead">Tenang, tinggal klik ayokajian.com</div>
+
+            <div id="eventBox" class="event-box">
+              <div id="eventTitle" class="event-title">Judul kajian</div>
+              <div id="eventMeta" class="event-meta"></div>
+            </div>
+
+            <div id="ctaLabelPreview" class="cta-label">Klik sekarang</div>
+            <div id="urlPreview" class="cta-url">ayokajian.com</div>
+            <div class="footer-note">Tambahkan link aktif di caption status WhatsApp agar benar-benar bisa diklik.</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const WIB_TZ = 'Asia/Jakarta';
+    let events = [];
+    let selectedEventId = null;
+
+    const el = (id) => document.getElementById(id);
+    const csvUrlInput = el('csvUrl');
+    const statusMsg = el('statusMsg');
+    const eventList = el('eventList');
+    const loadBtn = el('loadBtn');
+    const todayBtn = el('todayBtn');
+    const downloadBtn = el('downloadBtn');
+    const copyCaptionBtn = el('copyCaptionBtn');
+
+    const inputs = {
+      brandText: el('brandText'),
+      headlineText: el('headlineText'),
+      subheadText: el('subheadText'),
+      ctaLabel: el('ctaLabel'),
+      urlText: el('urlText'),
+      showEventBox: el('showEventBox'),
+      bgStart: el('bgStart'),
+      bgEnd: el('bgEnd'),
+      accentColor: el('accentColor'),
+      glowColor: el('glowColor'),
+      headlineSize: el('headlineSize')
+    };
+
+    const preview = {
+      card: el('statusCard'),
+      brand: el('brandPreview'),
+      headline: el('headlinePreview'),
+      subhead: el('subheadPreview'),
+      eventBox: el('eventBox'),
+      eventTitle: el('eventTitle'),
+      eventMeta: el('eventMeta'),
+      ctaLabel: el('ctaLabelPreview'),
+      url: el('urlPreview')
+    };
+
+    function escapeHtml(str = '') {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function parseCSV(csvText) {
+      const rows = [];
+      let row = [];
+      let value = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        const next = csvText[i + 1];
+
+        if (char === '"') {
+          if (insideQuotes && next === '"') {
+            value += '"';
+            i++;
+          } else {
+            insideQuotes = !insideQuotes;
+          }
+        } else if (char === ',' && !insideQuotes) {
+          row.push(value);
+          value = '';
+        } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          row.push(value);
+          if (row.some(cell => cell !== '')) rows.push(row);
+          row = [];
+          value = '';
+        } else {
+          value += char;
+        }
+      }
+
+      if (value.length || row.length) {
+        row.push(value);
+        if (row.some(cell => cell !== '')) rows.push(row);
+      }
+
+      if (!rows.length) return [];
+
+      const headers = rows[0].map(h => normalizeHeader(h));
+      return rows.slice(1).map((r, idx) => {
+        const obj = { __row: idx + 2 };
+        headers.forEach((header, i) => obj[header] = (r[i] || '').trim());
+        obj.id = obj.id || `row-${idx + 2}`;
+        return obj;
+      });
+    }
+
+    function normalizeHeader(header = '') {
+      return header
+        .trim()
+        .replace(/\uFEFF/g, '')
+        .replace(/\s+/g, '')
+        .replace(/[^a-zA-Z0-9_]/g, '')
+        .toLowerCase();
+    }
+
+    function pick(obj, keys) {
+      for (const k of keys) {
+        if (obj[k] != null && String(obj[k]).trim() !== '') return String(obj[k]).trim();
+      }
+      return '';
+    }
+
+    function toWIBDateKey(date = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: WIB_TZ,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(date);
+      const map = Object.fromEntries(parts.map(p => [p.type, p.value]));
+      return `${map.year}-${map.month}-${map.day}`;
+    }
+
+    function formatDateIndo(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(`${dateStr}T00:00:00`);
+      if (Number.isNaN(d.getTime())) return dateStr;
+      return new Intl.DateTimeFormat('id-ID', {
+        timeZone: WIB_TZ,
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }).format(d);
+    }
+
+    function prettyTime(timeStr) {
+      return timeStr || '-';
+    }
+
+    function mapEvent(raw) {
+      const title = pick(raw, ['title', 'judul', 'nama']);
+      const ustadz = pick(raw, ['ustadz', 'pemateri', 'speaker']);
+      const topic = pick(raw, ['topic', 'tema', 'topik']);
+      const date = pick(raw, ['date', 'tanggal']);
+      const time = pick(raw, ['time', 'jam', 'waktu']);
+      const place = pick(raw, ['place', 'masjid', 'lokasi', 'tempat']);
+      const address = pick(raw, ['address', 'alamat']);
+      const mode = pick(raw, ['mode']);
+      const streamUrl = pick(raw, ['streamurl']);
+      const mapsUrl = pick(raw, ['mapsurl']);
+      return {
+        id: raw.id,
+        title,
+        ustadz,
+        topic,
+        date,
+        time,
+        place,
+        address,
+        mode,
+        streamUrl,
+        mapsUrl,
+        isTodayWIB: date === toWIBDateKey()
+      };
+    }
+
+    function formatEventLine(label, value) {
+      return value ? `<div><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</div>` : '';
+    }
+
+    function renderEventBox(event) {
+      if (!inputs.showEventBox.checked || !event) {
+        preview.eventBox.style.display = 'none';
+        return;
+      }
+
+      preview.eventBox.style.display = 'block';
+      preview.eventTitle.textContent = event.topic || event.title || 'Kajian Pilihan Hari Ini';
+      preview.eventMeta.innerHTML = [
+        formatEventLine('Ustadz', event.ustadz),
+        formatEventLine('Tanggal', formatDateIndo(event.date)),
+        formatEventLine('Waktu', prettyTime(event.time)),
+        formatEventLine('Tempat', event.place),
+        formatEventLine('Alamat', event.address),
+        formatEventLine('Mode', event.mode)
+      ].filter(Boolean).join('');
+    }
+
+    function highlightKajianWord(text) {
+      const safe = escapeHtml(text).replace(/kajian/ig, '<span class="accent">$&</span>');
+      return safe.replace(/\n/g, '<br>');
+    }
+
+    function updatePreview() {
+      preview.brand.textContent = inputs.brandText.value || 'AYOKAJIAN';
+      preview.headline.innerHTML = highlightKajianWord(inputs.headlineText.value || 'Bingung mau kajian dimana hari ini?');
+      preview.subhead.innerHTML = escapeHtml(inputs.subheadText.value || '').replace(/\n/g, '<br>');
+      preview.ctaLabel.textContent = inputs.ctaLabel.value || 'Klik sekarang';
+      preview.url.textContent = inputs.urlText.value || 'ayokajian.com';
+
+      preview.card.style.background = `radial-gradient(circle at 20% 20%, ${hexToRgba(inputs.accentColor.value, .20)}, transparent 35%), radial-gradient(circle at 85% 15%, ${hexToRgba(inputs.glowColor.value, .18)}, transparent 28%), radial-gradient(circle at 50% 85%, rgba(255,255,255,.06), transparent 30%), linear-gradient(180deg, ${inputs.bgStart.value} 0%, ${mixHex(inputs.bgStart.value, inputs.bgEnd.value, .55)} 55%, ${inputs.bgEnd.value} 100%)`;
+      preview.card.style.setProperty('--headlineAccent', inputs.accentColor.value);
+      preview.card.style.setProperty('--cardGlow', inputs.glowColor.value);
+      preview.headline.style.fontSize = `${inputs.headlineSize.value}px`;
+
+      const selected = events.find(e => e.id === selectedEventId) || null;
+      renderEventBox(selected);
+    }
+
+    function renderEventList() {
+      if (!events.length) {
+        eventList.innerHTML = '<div class="notice">Belum ada data. Klik <strong>Muat data kajian</strong> dulu.</div>';
+        return;
+      }
+
+      eventList.innerHTML = events.map(event => {
+        const active = event.id === selectedEventId ? 'active' : '';
+        return `
+          <div class="event-item ${active}" data-id="${escapeHtml(event.id)}">
+            <div class="t">${escapeHtml(event.topic || event.title || 'Tanpa judul')}</div>
+            <div class="m">${escapeHtml(formatDateIndo(event.date))}<br>${escapeHtml(prettyTime(event.time))}${event.place ? ` · ${escapeHtml(event.place)}` : ''}</div>
+          </div>
+        `;
+      }).join('');
+
+      eventList.querySelectorAll('.event-item').forEach(node => {
+        node.addEventListener('click', () => {
+          selectedEventId = node.dataset.id;
+          renderEventList();
+          updatePreview();
+        });
+      });
+    }
+
+    async function loadCSV() {
+      const url = csvUrlInput.value.trim();
+      if (!url) {
+        statusMsg.className = 'notice error';
+        statusMsg.textContent = 'CSV URL belum diisi.';
+        return;
+      }
+
+      statusMsg.className = 'notice';
+      statusMsg.textContent = 'Sedang memuat data kajian...';
+
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const parsed = parseCSV(text).map(mapEvent).filter(e => e.date || e.title || e.topic);
+
+        events = parsed.sort((a, b) => {
+          const da = `${a.date || ''} ${a.time || ''}`;
+          const db = `${b.date || ''} ${b.time || ''}`;
+          return da.localeCompare(db);
+        });
+
+        const todayEvents = events.filter(e => e.isTodayWIB);
+        selectedEventId = (todayEvents[0] || events[0] || {}).id || null;
+
+        renderEventList();
+        updatePreview();
+
+        statusMsg.className = 'notice success';
+        statusMsg.innerHTML = `Berhasil memuat <strong>${events.length}</strong> kajian. Kajian hari ini (WIB): <strong>${todayEvents.length}</strong>.`;
+      } catch (err) {
+        console.error(err);
+        events = [];
+        selectedEventId = null;
+        renderEventList();
+        updatePreview();
+        statusMsg.className = 'notice error';
+        statusMsg.textContent = 'Gagal memuat CSV. Pastikan link publish CSV benar dan bisa diakses publik.';
+      }
+    }
+
+    function pickTodayEvent() {
+      const todayEvents = events.filter(e => e.isTodayWIB);
+      if (!todayEvents.length) {
+        statusMsg.className = 'notice error';
+        statusMsg.textContent = 'Tidak ada kajian hari ini berdasarkan WIB.';
+        return;
+      }
+      selectedEventId = todayEvents[0].id;
+      renderEventList();
+      updatePreview();
+      statusMsg.className = 'notice success';
+      statusMsg.textContent = 'Kajian hari ini berhasil dipilih.';
+    }
+
+    function makeCaption() {
+      const lines = [
+        inputs.headlineText.value.trim(),
+        '',
+        (inputs.subheadText.value || 'Tenang, klik saja:').trim(),
+        `https://${(inputs.urlText.value || 'ayokajian.com').replace(/^https?:\/\//, '').trim()}`
+      ];
+      return lines.join('\n');
+    }
+
+    async function copyCaption() {
+      const text = makeCaption();
+      try {
+        await navigator.clipboard.writeText(text);
+        statusMsg.className = 'notice success';
+        statusMsg.textContent = 'Caption WhatsApp berhasil di-copy.';
+      } catch (err) {
+        statusMsg.className = 'notice error';
+        statusMsg.textContent = 'Clipboard gagal. Copy manual dari console / source.';
+        console.log(text);
+      }
+    }
+
+    function hexToRgba(hex, alpha) {
+      const h = hex.replace('#', '');
+      const bigint = parseInt(h.length === 3 ? h.split('').map(x => x + x).join('') : h, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function mixHex(hex1, hex2, weight = .5) {
+      const c1 = parseInt(hex1.slice(1), 16);
+      const c2 = parseInt(hex2.slice(1), 16);
+      const r = Math.round(((c1 >> 16) & 255) * (1 - weight) + ((c2 >> 16) & 255) * weight);
+      const g = Math.round(((c1 >> 8) & 255) * (1 - weight) + ((c2 >> 8) & 255) * weight);
+      const b = Math.round((c1 & 255) * (1 - weight) + (c2 & 255) * weight);
+      return `#${[r,g,b].map(v => v.toString(16).padStart(2,'0')).join('')}`;
+    }
+
+    async function downloadPNG() {
+      updatePreview();
+      const node = preview.card;
+      const width = 1080;
+      const height = 1920;
+      const clone = node.cloneNode(true);
+      clone.style.width = width + 'px';
+      clone.style.height = height + 'px';
+      clone.style.borderRadius = '0';
+      clone.style.margin = '0';
+
+      const wrapper = document.createElement('div');
+      wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+      wrapper.style.width = width + 'px';
+      wrapper.style.height = height + 'px';
+      wrapper.appendChild(clone);
+
+      const styles = Array.from(document.styleSheets).map(sheet => {
+        try {
+          return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
+        } catch {
+          return '';
+        }
+      }).join('\n');
+
+      const serialized = new XMLSerializer().serializeToString(wrapper);
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+          <foreignObject width="100%" height="100%">
+            <style>${styles}</style>
+            ${serialized}
+          </foreignObject>
+        </svg>`;
+
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        canvas.toBlob((pngBlob) => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(pngBlob);
+          a.download = `ayokajian-status-${Date.now()}.png`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        }, 'image/png');
+      };
+      img.onerror = () => {
+        statusMsg.className = 'notice error';
+        statusMsg.textContent = 'Gagal render PNG di browser ini. Coba Chrome/Edge terbaru.';
+      };
+      img.src = url;
+    }
+
+    Object.values(inputs).forEach(input => {
+      input.addEventListener('input', updatePreview);
+      input.addEventListener('change', updatePreview);
+    });
+
+    loadBtn.addEventListener('click', loadCSV);
+    todayBtn.addEventListener('click', pickTodayEvent);
+    downloadBtn.addEventListener('click', downloadPNG);
+    copyCaptionBtn.addEventListener('click', copyCaption);
+
+    updatePreview();
+  </script>
+</body>
+</html>
