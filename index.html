@@ -8,7 +8,6 @@
     :root {
       --bg: #08110f;
       --panel: #0e1b18;
-      --panel-2: #12211d;
       --text: #eef7f2;
       --muted: #b8c8c0;
       --gold: #e7c56a;
@@ -21,7 +20,13 @@
     }
 
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: linear-gradient(180deg, #06100d 0%, #0b1714 100%); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, #06100d 0%, #0b1714 100%);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
     body { min-height: 100vh; }
 
     .wrap {
@@ -47,19 +52,22 @@
     .section { padding: 20px; border-bottom: 1px solid var(--line); }
     .section:last-child { border-bottom: 0; }
 
-    h1, h2, h3, p { margin: 0; }
+    h1, h2, p { margin: 0; }
     h1 { font-size: 26px; line-height: 1.1; letter-spacing: -.03em; }
     h2 { font-size: 16px; margin-bottom: 14px; color: var(--gold); letter-spacing: .02em; }
     .sub { color: var(--muted); margin-top: 8px; font-size: 14px; line-height: 1.5; }
-    .tiny { color: var(--muted); font-size: 12px; line-height: 1.5; }
 
     .grid { display: grid; gap: 12px; }
     .grid.two { grid-template-columns: 1fr 1fr; }
-    .grid.three { grid-template-columns: repeat(3, 1fr); }
 
-    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
 
-    input, select, textarea, button {
+    input, textarea, button {
       width: 100%;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
@@ -74,7 +82,7 @@
     input[type="color"] { padding: 6px; height: 46px; }
     input[type="range"] { padding: 0; }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus, textarea:focus {
       border-color: rgba(231,197,106,.6);
       box-shadow: 0 0 0 4px rgba(231,197,106,.12);
     }
@@ -208,9 +216,9 @@
 
     .headline {
       font-weight: 800;
-      line-height: 1.04;
+      line-height: 1.08;
       letter-spacing: -.045em;
-      font-size: 52px;
+      font-size: 42px;
       text-wrap: balance;
       text-shadow: 0 8px 24px rgba(0,0,0,.35);
     }
@@ -219,38 +227,41 @@
 
     .subhead {
       margin-top: 18px;
-      font-size: 26px;
-      line-height: 1.2;
+      font-size: 24px;
+      line-height: 1.25;
       color: rgba(255,255,255,.92);
       text-wrap: balance;
       text-shadow: 0 8px 24px rgba(0,0,0,.3);
     }
 
     .event-box {
-      margin-top: 26px;
-      padding: 16px 16px 18px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-      border: 1px solid rgba(255,255,255,.12);
+      margin-top: 24px;
+      padding: 18px 18px 20px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(8px);
       display: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      box-shadow: none;
+      text-align: left;
     }
 
     .event-title {
-      font-size: 22px;
-      line-height: 1.18;
+      font-size: 24px;
+      line-height: 1.2;
       font-weight: 800;
       text-wrap: balance;
+      margin-bottom: 8px;
     }
 
     .event-meta {
       margin-top: 12px;
       display: grid;
-      gap: 8px;
-      color: rgba(255,255,255,.84);
-      font-size: 14px;
-      line-height: 1.45;
+      gap: 10px;
+      color: rgba(255,255,255,.92);
+      font-size: 15px;
+      line-height: 1.5;
+      text-align: left;
     }
 
     .cta-label {
@@ -277,13 +288,6 @@
       letter-spacing: -.03em;
       box-shadow: 0 12px 30px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.1);
       word-break: break-word;
-    }
-
-    .footer-note {
-      margin-top: 14px;
-      font-size: 12px;
-      color: rgba(255,255,255,.56);
-      line-height: 1.45;
     }
 
     .list {
@@ -330,9 +334,6 @@
       background: rgba(47,179,127,.08);
     }
 
-    .muted { color: var(--muted); }
-    .hidden { display: none !important; }
-
     @media (max-width: 1080px) {
       .wrap { grid-template-columns: 1fr; }
       .sidebar { position: static; }
@@ -343,9 +344,9 @@
       .toolbar { padding: 16px 14px 0; }
       .preview-wrap { padding: 14px; }
       #statusCard { width: min(100%, 360px); }
-      .grid.two, .grid.three { grid-template-columns: 1fr; }
-      .headline { font-size: 46px; }
-      .subhead { font-size: 23px; }
+      .grid.two { grid-template-columns: 1fr; }
+      .headline { font-size: 38px; }
+      .subhead { font-size: 22px; }
       .cta-url { font-size: 22px; }
     }
   </style>
@@ -355,7 +356,7 @@
     <aside class="card sidebar">
       <div class="section">
         <h1>AyoKajian Status Generator</h1>
-        <p class="sub">Generator gambar status WhatsApp otomatis dari data kajian CSV. Sudah pakai logika <strong>WIB</strong> untuk filter kajian hari ini.</p>
+        <p class="sub">Generator gambar status WhatsApp otomatis dari data kajian CSV. Sudah pakai logika <strong>WIB</strong> dan tampilan detail minimalis/icon style.</p>
       </div>
 
       <div class="section grid">
@@ -398,7 +399,7 @@
           <input id="urlText" type="text" value="ayokajian.com" />
         </div>
         <div>
-          <label><input id="showEventBox" type="checkbox" checked style="width:auto; margin-right:8px;"> Tampilkan box detail kajian terpilih</label>
+          <label><input id="showEventBox" type="checkbox" checked style="width:auto; margin-right:8px;"> Tampilkan detail kajian terpilih</label>
         </div>
       </div>
 
@@ -426,15 +427,15 @@
         </div>
         <div>
           <label for="headlineSize">Ukuran judul</label>
-          <input id="headlineSize" type="range" min="36" max="68" step="1" value="52" />
+          <input id="headlineSize" type="range" min="34" max="56" step="1" value="42" />
         </div>
       </div>
 
       <div class="section actions">
         <button id="downloadBtn" class="btn btn-primary">Download PNG</button>
         <button id="copyCaptionBtn" class="btn btn-secondary">Copy caption WhatsApp</button>
-        <div class="notice success">
-          Caption hasil copy akan berisi hook + link aktif untuk status WhatsApp.
+        <div class="notice">
+          Link di gambar tidak bisa diklik di WhatsApp. Pakai caption untuk link aktif.
         </div>
       </div>
     </aside>
@@ -465,13 +466,13 @@
 
             <div id="ctaLabelPreview" class="cta-label">Klik sekarang</div>
             <div id="urlPreview" class="cta-url">ayokajian.com</div>
-           
           </div>
         </div>
       </div>
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     const WIB_TZ = 'Asia/Jakarta';
     let events = [];
@@ -619,10 +620,6 @@
       const date = pick(raw, ['date', 'tanggal']);
       const time = pick(raw, ['time', 'jam', 'waktu']);
       const place = pick(raw, ['place', 'masjid', 'lokasi', 'tempat']);
-      const address = pick(raw, ['address', 'alamat']);
-      const mode = pick(raw, ['mode']);
-      const streamUrl = pick(raw, ['streamurl']);
-      const mapsUrl = pick(raw, ['mapsurl']);
       return {
         id: raw.id,
         title,
@@ -631,16 +628,13 @@
         date,
         time,
         place,
-        address,
-        mode,
-        streamUrl,
-        mapsUrl,
         isTodayWIB: date === toWIBDateKey()
       };
     }
 
-    function formatEventLine(label, value) {
-      return value ? `<div><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</div>` : '';
+    function highlightKajianWord(text) {
+      const safe = escapeHtml(text).replace(/kajian/ig, '<span class="accent">$&</span>');
+      return safe.replace(/\n/g, '<br>');
     }
 
     function renderEventBox(event) {
@@ -650,20 +644,14 @@
       }
 
       preview.eventBox.style.display = 'block';
-      preview.eventTitle.textContent = event.topic || event.title || 'Kajian Pilihan Hari Ini';
-      preview.eventMeta.innerHTML = [
-        formatEventLine('Ustadz', event.ustadz),
-        formatEventLine('Tanggal', formatDateIndo(event.date)),
-        formatEventLine('Waktu', prettyTime(event.time)),
-        formatEventLine('Tempat', event.place),
-        formatEventLine('Alamat', event.address),
-        formatEventLine('Mode', event.mode)
-      ].filter(Boolean).join('');
-    }
+      preview.eventTitle.textContent = event.title || event.topic || 'Kajian Hari Ini';
 
-    function highlightKajianWord(text) {
-      const safe = escapeHtml(text).replace(/kajian/ig, '<span class="accent">$&</span>');
-      return safe.replace(/\n/g, '<br>');
+      preview.eventMeta.innerHTML = [
+        event.ustadz ? `<div>👤 ${escapeHtml(event.ustadz)}</div>` : '',
+        event.date ? `<div>📅 ${escapeHtml(formatDateIndo(event.date))}</div>` : '',
+        event.time ? `<div>⏰ ${escapeHtml(prettyTime(event.time))}</div>` : '',
+        event.place ? `<div>🕌 ${escapeHtml(event.place)}</div>` : ''
+      ].filter(Boolean).join('');
     }
 
     function updatePreview() {
@@ -692,7 +680,7 @@
         const active = event.id === selectedEventId ? 'active' : '';
         return `
           <div class="event-item ${active}" data-id="${escapeHtml(event.id)}">
-            <div class="t">${escapeHtml(event.topic || event.title || 'Tanpa judul')}</div>
+            <div class="t">${escapeHtml(event.title || event.topic || 'Tanpa judul')}</div>
             <div class="m">${escapeHtml(formatDateIndo(event.date))}<br>${escapeHtml(prettyTime(event.time))}${event.place ? ` · ${escapeHtml(event.place)}` : ''}</div>
           </div>
         `;
@@ -722,8 +710,8 @@
         const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
-        const parsed = parseCSV(text).map(mapEvent).filter(e => e.date || e.title || e.topic);
 
+        const parsed = parseCSV(text).map(mapEvent).filter(e => e.date || e.title || e.topic);
         events = parsed.sort((a, b) => {
           const da = `${a.date || ''} ${a.time || ''}`;
           const db = `${b.date || ''} ${b.time || ''}`;
@@ -745,7 +733,7 @@
         renderEventList();
         updatePreview();
         statusMsg.className = 'notice error';
-        statusMsg.textContent = 'Gagal memuat CSV. Pastikan link publish CSV benar dan bisa diakses publik.';
+        statusMsg.textContent = 'Gagal memuat CSV. Pastikan link publish CSV benar, bisa diakses publik, dan file dibuka dari hosting/localhost.';
       }
     }
 
@@ -756,9 +744,11 @@
         statusMsg.textContent = 'Tidak ada kajian hari ini berdasarkan WIB.';
         return;
       }
+
       selectedEventId = todayEvents[0].id;
       renderEventList();
       updatePreview();
+
       statusMsg.className = 'notice success';
       statusMsg.textContent = 'Kajian hari ini berhasil dipilih.';
     }
@@ -775,14 +765,13 @@
 
     async function copyCaption() {
       const text = makeCaption();
+
       try {
         await navigator.clipboard.writeText(text);
         statusMsg.className = 'notice success';
         statusMsg.textContent = 'Caption WhatsApp berhasil di-copy.';
       } catch (err) {
-        statusMsg.className = 'notice error';
-        statusMsg.textContent = 'Clipboard gagal. Copy manual dari console / source.';
-        console.log(text);
+        window.prompt('Copy caption di bawah ini:', text);
       }
     }
 
@@ -806,61 +795,26 @@
 
     async function downloadPNG() {
       updatePreview();
-      const node = preview.card;
-      const width = 1080;
-      const height = 1920;
-      const clone = node.cloneNode(true);
-      clone.style.width = width + 'px';
-      clone.style.height = height + 'px';
-      clone.style.borderRadius = '0';
-      clone.style.margin = '0';
 
-      const wrapper = document.createElement('div');
-      wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-      wrapper.style.width = width + 'px';
-      wrapper.style.height = height + 'px';
-      wrapper.appendChild(clone);
+      try {
+        const canvas = await html2canvas(document.getElementById('statusCard'), {
+          backgroundColor: null,
+          scale: 3,
+          useCORS: true
+        });
 
-      const styles = Array.from(document.styleSheets).map(sheet => {
-        try {
-          return Array.from(sheet.cssRules).map(rule => rule.cssText).join('\n');
-        } catch {
-          return '';
-        }
-      }).join('\n');
+        const link = document.createElement('a');
+        link.download = `ayokajian-status-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
 
-      const serialized = new XMLSerializer().serializeToString(wrapper);
-      const svg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-          <foreignObject width="100%" height="100%">
-            <style>${styles}</style>
-            ${serialized}
-          </foreignObject>
-        </svg>`;
-
-      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        canvas.toBlob((pngBlob) => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(pngBlob);
-          a.download = `ayokajian-status-${Date.now()}.png`;
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        }, 'image/png');
-      };
-      img.onerror = () => {
+        statusMsg.className = 'notice success';
+        statusMsg.textContent = 'PNG berhasil di-download.';
+      } catch (err) {
+        console.error(err);
         statusMsg.className = 'notice error';
-        statusMsg.textContent = 'Gagal render PNG di browser ini. Coba Chrome/Edge terbaru.';
-      };
-      img.src = url;
+        statusMsg.textContent = 'Download PNG gagal. Coba refresh halaman lalu ulangi di Chrome/Edge terbaru.';
+      }
     }
 
     Object.values(inputs).forEach(input => {
